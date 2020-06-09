@@ -1,5 +1,7 @@
 # IdeaShare API
 
+Live version: [here](https://api20200609223508.azurewebsites.net/swagger/index.html)
+
 This is an API for a simple publishing platform. It was built with .NET Core 3 and EF Core. Its features include:
 * Creating and managing user account
 * Authentication
