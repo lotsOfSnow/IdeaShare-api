@@ -35,8 +35,12 @@ Follow these steps to get your development environment set up:
      ```
      dotnet build
      ```
-  5. Launch the API by running:
+  5. Create the database: 
+     ```
+     dotnet ef database update --project .\src\Api\
+     ```
+  6. Launch the API by running:
      ```
 	 dotnet run --project .\src\Api\
 	 ```
-  6. Go to [https://localhost:5001/swagger](https://localhost:5001/swagger/index.html) in your browser to view the API.
+  7. Go to [https://localhost:5001/swagger](https://localhost:5001/swagger/index.html) in your browser to view the API.
