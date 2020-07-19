@@ -10,7 +10,6 @@ namespace IdeaShare.Infrastructure
         public DbSet<Tag> Tags { get; set; }
         public DbSet<ArticleTag> ArticleTags { get; set; }
         public DbSet<Comment> Comments { get; set; }
-        public DbSet<AuthorComment> AuthorComments { get; set; }
         public DbSet<Like> Likes { get; set; }
 
         public AppDbContext(DbContextOptions<AppDbContext> options) : base(options) { }
@@ -18,7 +17,6 @@ namespace IdeaShare.Infrastructure
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             modelBuilder.Entity<ArticleTag>().HasKey(at => new { at.ArticleId, at.TagId });
-            modelBuilder.Entity<AuthorComment>().HasKey(ac => new { ac.AuthorId, ac.CommentId });
             modelBuilder.Entity<Like>().HasKey(l => new { l.AppUserId, l.ArticleId });
             base.OnModelCreating(modelBuilder);
         }

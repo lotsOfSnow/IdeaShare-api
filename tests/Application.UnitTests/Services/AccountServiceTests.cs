@@ -1,6 +1,6 @@
 ﻿using IdeaShare.Application.Options;
-using IdeaShare.Application.Services;
 using IdeaShare.Domain;
+using IdeaShare.Infrastructure.Services;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
 using Moq;

@@ -4,7 +4,7 @@ using System.Collections.Generic;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace IdeaShare.Application.Services
+namespace IdeaShare.Application.Interfaces
 {
     public interface ITagService
     {

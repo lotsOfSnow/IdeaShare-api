@@ -1,11 +1,11 @@
-﻿using IdeaShare.Domain;
-using IdeaShare.Infrastructure;
+﻿using IdeaShare.Application.Interfaces;
+using IdeaShare.Domain;
 using Microsoft.EntityFrameworkCore;
 using System;
 using System.Linq;
 using System.Threading.Tasks;
 
-namespace IdeaShare.Application.Services
+namespace IdeaShare.Infrastructure.Services
 {
     public class UserService : IUserService
     {

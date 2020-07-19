@@ -1,9 +1,9 @@
-﻿using IdeaShare.Application.Models.ArticleModels;
+﻿using IdeaShare.Application.Interfaces;
+using IdeaShare.Application.Models.ArticleModels;
 using IdeaShare.Application.Options;
 using IdeaShare.Application.Utilities;
 using IdeaShare.Domain;
 using IdeaShare.Extensions.System;
-using IdeaShare.Infrastructure;
 using Microsoft.Data.Sqlite;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Internal;
@@ -12,7 +12,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 
-namespace IdeaShare.Application.Services
+namespace IdeaShare.Infrastructure.Services
 {
     public sealed class ArticleService : IArticleService
     {
@@ -24,7 +24,7 @@ namespace IdeaShare.Application.Services
         {
             _context = context ?? throw new ArgumentNullException(nameof(context));
             _tagService = tagService ?? throw new ArgumentNullException(nameof(tagService));
-            _imageSettings = imageSettings;
+            _imageSettings = imageSettings ?? throw new ArgumentNullException(nameof(imageSettings));
         }
 
         public async Task<RequestWithPayloadResult<Article>> CreateAsync(string authorId, ArticleCreationModel articleModel)
@@ -39,7 +39,7 @@ namespace IdeaShare.Application.Services
                 AuthorId = authorId
             };
 
-            if(articleModel.Tags != null)
+            if (articleModel.Tags != null)
             {
                 var tagsFromDatabase = await _tagService.CreateRangeAsync(articleModel.Tags.Split(","));
                 AttachArticleTags(article, tagsFromDatabase);
@@ -47,9 +47,8 @@ namespace IdeaShare.Application.Services
 
             if (articleModel.FeaturedImage != null)
             {
-                var uploadedFilePath = await ImageUtilities.ProcessUploadedFile(articleModel.FeaturedImage, _imageSettings.FeaturedImage.Location,
+                article.FeaturedImage = await ImageUtilities.ProcessUploadedFile(articleModel.FeaturedImage, _imageSettings.FeaturedImage.Location,
                     _imageSettings.FeaturedImage.Format, _imageSettings.FeaturedImage.Width, _imageSettings.FeaturedImage.Height);
-                article.FeaturedImage = uploadedFilePath;
             }
 
             await _context.Articles.AddAsync(article);
@@ -95,9 +94,8 @@ namespace IdeaShare.Application.Services
 
             if (updatedArticleModel.FeaturedImage != null)
             {
-                var uploadedFilePath = await ImageUtilities.ProcessUploadedFile(updatedArticleModel.FeaturedImage, _imageSettings.FeaturedImage.Location,
+                article.FeaturedImage = await ImageUtilities.ProcessUploadedFile(updatedArticleModel.FeaturedImage, _imageSettings.FeaturedImage.Location,
                     _imageSettings.FeaturedImage.Format, _imageSettings.FeaturedImage.Width, _imageSettings.FeaturedImage.Height);
-                article.FeaturedImage = uploadedFilePath;
             }
 
             article.LastUpdatedDate = DateTime.UtcNow;
@@ -125,7 +123,7 @@ namespace IdeaShare.Application.Services
 
         public async Task<int> GetCountAsync(string? tag)
         {
-            if(tag == null)
+            if (tag == null)
             {
                 return await _context.Articles.CountAsync();
             }
@@ -145,7 +143,7 @@ namespace IdeaShare.Application.Services
                 }
             }
 
-            if(tag != null)
+            if (tag != null)
             {
                 query = query.Where(x => x.TagList.Any(y => y.TagId == tag));
             }
@@ -160,7 +158,7 @@ namespace IdeaShare.Application.Services
 
             var user = await _context.Users.FirstOrDefaultAsync(x => x.UserName == username);
 
-            if(user == null)
+            if (user == null)
             {
                 return new RequestWithPayloadResult<IEnumerable<Article>>
                 {
@@ -191,8 +189,6 @@ namespace IdeaShare.Application.Services
                     return articlesQueryable.OrderBy(x => x.CreationDate);
                 case "-date":
                     return articlesQueryable.OrderByDescending(x => x.CreationDate);
-                default:
-                    break;
             }
 
             return articlesQueryable;
@@ -350,7 +346,7 @@ namespace IdeaShare.Application.Services
                 if (sqlException != null && sqlException.SqliteErrorCode == 19)
                 {
                     _context.Entry(like).State = EntityState.Detached;
-                    
+
                     return new RequestWithPayloadResult<Like>
                     {
                         Errors = new Dictionary<string, string> { { "Like", "Like already exists." } }
@@ -418,7 +414,7 @@ namespace IdeaShare.Application.Services
         {
             var user = await _context.Users.FirstOrDefaultAsync(x => x.UserName == username);
 
-            if(user == null)
+            if (user == null)
             {
                 return new RequestWithPayloadResult<bool>
                 {
@@ -428,7 +424,7 @@ namespace IdeaShare.Application.Services
 
             var article = await _context.Articles.Include(x => x.Likes).FirstOrDefaultAsync(x => x.Id == articleId);
 
-            if(article == null)
+            if (article == null)
             {
                 return new RequestWithPayloadResult<bool>
                 {

@@ -1,13 +1,10 @@
-using System;
-using System.Drawing.Imaging;
-using System.Linq;
-using System.Reflection;
-using System.Text;
 using AutoMapper;
+using IdeaShare.Api.Models;
+using IdeaShare.Application.Interfaces;
 using IdeaShare.Application.Options;
-using IdeaShare.Application.Services;
 using IdeaShare.Domain;
 using IdeaShare.Infrastructure;
+using IdeaShare.Infrastructure.Services;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
@@ -19,10 +16,11 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
-using IdeaShare.Api.Models;
-using Microsoft.AspNetCore.HttpOverrides;
-using IdeaShare.Application.Utilities;
-using System.IO;
+using System;
+using System.Drawing.Imaging;
+using System.Linq;
+using System.Reflection;
+using System.Text;
 
 namespace IdeaShare.Api
 {
@@ -72,7 +70,6 @@ namespace IdeaShare.Api
                 options.Password.RequireNonAlphanumeric = false;
                 options.Password.RequireUppercase = false;
                 options.User.RequireUniqueEmail = true;
-
                 options.ClaimsIdentity.UserIdClaimType = "id";
             });
 
@@ -149,7 +146,7 @@ namespace IdeaShare.Api
                       }
                      },
                      new string[] { }
-                    }               
+                    }
                 });
             });
 
@@ -207,12 +204,12 @@ namespace IdeaShare.Api
             };
 
             PropertyInfo prop = typeof(ImageFormat).GetProperties().Where(p => p.Name.Equals(Configuration[$"ImageSettings:{name}:Format"], StringComparison.InvariantCultureIgnoreCase)).FirstOrDefault();
-            if(prop == null)
+            if (prop == null)
             {
                 throw new Exception("Can't parse ImageFormat");
             }
             imageSettings.Format = prop.GetValue(prop) as ImageFormat;
-            
+
             return imageSettings;
         }
     }

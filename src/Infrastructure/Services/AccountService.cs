@@ -1,9 +1,8 @@
-﻿using AutoMapper;
+﻿using IdeaShare.Application.Interfaces;
 using IdeaShare.Application.Models.AppUserModels;
 using IdeaShare.Application.Options;
 using IdeaShare.Application.Utilities;
 using IdeaShare.Domain;
-using IdeaShare.Infrastructure;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
@@ -15,7 +14,7 @@ using System.Security.Claims;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace IdeaShare.Application.Services
+namespace IdeaShare.Infrastructure.Services
 {
     public class AccountService : IAccountService
     {
@@ -38,11 +37,11 @@ namespace IdeaShare.Application.Services
         {
             var emailAlreadyExists = (await _userManager.FindByEmailAsync(email)) != null;
 
-            if(emailAlreadyExists)
+            if (emailAlreadyExists)
             {
                 return new RequestWithPayloadResult<AppUser>
                 {
-                    Errors = new Dictionary<string, string>() {{ "Email", "User with this email address already exists" } }
+                    Errors = new Dictionary<string, string>() { { "Email", "User with this email address already exists" } }
                 };
             }
 
@@ -66,7 +65,7 @@ namespace IdeaShare.Application.Services
 
             var registrationResult = await _userManager.CreateAsync(newUser, password);
 
-            if(!registrationResult.Succeeded)
+            if (!registrationResult.Succeeded)
             {
                 return new RequestWithPayloadResult<AppUser>
                 {
@@ -104,7 +103,7 @@ namespace IdeaShare.Application.Services
             }
 
             var token = await GenerateTokenForUserAsync(user);
-            
+
             return new AppUserLoginResult
             {
                 Success = true,
@@ -137,7 +136,7 @@ namespace IdeaShare.Application.Services
                 }
             }
 
-            if(updateModel.ProfilePicture != null)
+            if (updateModel.ProfilePicture != null)
             {
                 var uploadedFilePath = await ImageUtilities.ProcessUploadedFile(updateModel.ProfilePicture, _imageSettings.ProfilePicture.Location,
                     _imageSettings.ProfilePicture.Format, _imageSettings.ProfilePicture.Width, _imageSettings.ProfilePicture.Height);

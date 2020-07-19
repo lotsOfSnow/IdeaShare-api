@@ -2,7 +2,7 @@
 using IdeaShare.Api.Models;
 using IdeaShare.Application.Models.ArticleModels;
 using IdeaShare.Application.Models.CommentModels;
-using IdeaShare.Application.Services;
+using IdeaShare.Application.Interfaces;
 using IdeaShare.Extensions.Microsoft.AspNetCore.Mvc.ModelBinding;
 using IdeaShare.Extensions.System;
 using IdeaShare.Extensions.System.Security.Claims;

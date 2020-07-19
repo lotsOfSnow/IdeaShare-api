@@ -7,7 +7,6 @@ namespace IdeaShare.Domain
 {
     public sealed class Article
     {
-
         [Key]
         public int Id { get; set; }
 
@@ -38,6 +37,6 @@ namespace IdeaShare.Domain
 
         public ICollection<Comment> Comments { get; set; } = new List<Comment>();
 
-        public ICollection<Like> Likes { get; set; } = new List<Like>(); 
+        public ICollection<Like> Likes { get; set; } = new List<Like>();
     }
 }

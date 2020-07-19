@@ -1,12 +1,12 @@
-﻿using IdeaShare.Domain;
-using IdeaShare.Infrastructure;
+﻿using IdeaShare.Application.Interfaces;
+using IdeaShare.Domain;
 using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 
-namespace IdeaShare.Application.Services
+namespace IdeaShare.Infrastructure.Services
 {
     public class CommentService : ICommentService
     {
@@ -20,13 +20,13 @@ namespace IdeaShare.Application.Services
         public async Task<bool> AddAsync(int articleId, string authorId, string commentBody)
         {
             var article = await _context.Articles.FindAsync(articleId);
-            if(article == null)
+            if (article == null)
             {
                 return false;
             }
 
             var user = await _context.Users.FindAsync(authorId);
-            if(user == null)
+            if (user == null)
             {
                 return false;
             }
@@ -39,18 +39,9 @@ namespace IdeaShare.Application.Services
                 ArticleId = articleId,
             };
 
-            var commentAuthor = new AuthorComment
-            {
-                Author = comment.Author,
-                AuthorId = comment.AuthorId,
-                Comment = comment,
-                CommentId = comment.Id
-            };
-
             article.Comments.Add(comment);
             user.Comments.Add(comment);
             _context.Comments.Add(comment);
-            _context.AuthorComments.Add(commentAuthor);
             return await _context.SaveChangesAsync() > 0;
         }
 
@@ -58,7 +49,7 @@ namespace IdeaShare.Application.Services
         {
             var articleExists = await _context.Articles.FirstOrDefaultAsync(x => x.Id == articleId) != null;
 
-            if(!articleExists)
+            if (!articleExists)
             {
                 return new RequestWithPayloadResult<IEnumerable<Comment>>
                 {
@@ -78,7 +69,7 @@ namespace IdeaShare.Application.Services
             var userArticles = _context.Articles.Where(x => x.AuthorId == userId);
             var allComments = _context.Comments.Include(x => x.Author);
 
-            return  from comment in allComments
+            return from comment in allComments
                    join userArticle in userArticles on comment.ArticleId equals userArticle.Id
                    select comment;
         }
@@ -93,16 +84,16 @@ namespace IdeaShare.Application.Services
         {
             var comment = await _context.Comments.Include(x => x.Article).FirstOrDefaultAsync(x => x.Id == commentId);
 
-            if(comment == null)
+            if (comment == null)
             {
                 return new BaseRequestResult
                 {
                     Errors = new Dictionary<string, string> { { "Comment", "Comment with this Id does not exist." } }
                 };
             }
-            
+
             // Only allow the comment to be deleted by its author and the person that wrote the article it was posted below.
-            if(comment.AuthorId != requestingUserId && comment.Article.AuthorId != requestingUserId)
+            if (comment.AuthorId != requestingUserId && comment.Article.AuthorId != requestingUserId)
             {
                 return new BaseRequestResult
                 {

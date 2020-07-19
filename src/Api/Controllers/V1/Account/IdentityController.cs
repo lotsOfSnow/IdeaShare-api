@@ -4,7 +4,7 @@ using AutoMapper;
 using IdeaShare.Api.Models;
 using IdeaShare.Application.Models.AppUserModels;
 using IdeaShare.Application.Options;
-using IdeaShare.Application.Services;
+using IdeaShare.Application.Interfaces;
 using IdeaShare.Contracts.V1.Requests;
 using IdeaShare.Contracts.V1.Responses;
 using IdeaShare.Extensions.System;

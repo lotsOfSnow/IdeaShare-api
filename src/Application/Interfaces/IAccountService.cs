@@ -3,7 +3,7 @@ using IdeaShare.Domain;
 using Microsoft.AspNetCore.Identity;
 using System.Threading.Tasks;
 
-namespace IdeaShare.Application.Services
+namespace IdeaShare.Application.Interfaces
 {
     public interface IAccountService
     {

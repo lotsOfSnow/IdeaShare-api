@@ -1,16 +1,16 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
-using AutoMapper;
+﻿using AutoMapper;
 using IdeaShare.Api.Models;
 using IdeaShare.Application.Models.AppUserModels;
 using IdeaShare.Application.Models.ArticleModels;
-using IdeaShare.Application.Services;
+using IdeaShare.Application.Interfaces;
 using IdeaShare.Extensions.Microsoft.AspNetCore.Mvc.ModelBinding;
 using IdeaShare.Extensions.System.Security.Claims;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Threading.Tasks;
 
 namespace IdeaShare.Api.Controllers.V1.Users
 {
@@ -37,10 +37,10 @@ namespace IdeaShare.Api.Controllers.V1.Users
             {
                 return BadRequest();
             }
-            
+
             var user = await _userService.GetUserAsync(username);
 
-            if(user == null)
+            if (user == null)
             {
                 return NotFound($"User {username} does not exist");
             }
@@ -55,7 +55,7 @@ namespace IdeaShare.Api.Controllers.V1.Users
         {
             var result = await _articleService.GetByUserAsync(username, sort);
 
-            if(!result.Success)
+            if (!result.Success)
             {
                 ModelState.AddModelErrors(result.Errors);
                 return NotFound(new ValidationResultModel(ModelState));
@@ -70,7 +70,7 @@ namespace IdeaShare.Api.Controllers.V1.Users
         {
             var result = await _articleService.GetLikedByUserAsync(username, sort);
 
-            if(!result.Success)
+            if (!result.Success)
             {
                 ModelState.AddModelErrors(result.Errors);
                 return NotFound(new ValidationResultModel(ModelState));
@@ -102,7 +102,7 @@ namespace IdeaShare.Api.Controllers.V1.Users
 
             var result = await _accountService.UpdateAsync(user, updateModel);
 
-            if(result.Success)
+            if (result.Success)
             {
                 return NoContent();
             }

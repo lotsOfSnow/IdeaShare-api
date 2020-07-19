@@ -1,12 +1,12 @@
-﻿using IdeaShare.Domain;
-using IdeaShare.Infrastructure;
+﻿using IdeaShare.Application.Interfaces;
+using IdeaShare.Domain;
 using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 
-namespace IdeaShare.Application.Services
+namespace IdeaShare.Infrastructure.Services
 {
     public class TagService : ITagService
     {
@@ -23,11 +23,11 @@ namespace IdeaShare.Application.Services
             var articleTags = new List<ArticleTag>(); // the list to which the tags will be appended
             var existingArticleTags = _context.ArticleTags.Where(x => x.Article == article); // query existing articleTags to compare them later and remove entries from db if tag was removed
 
-            for(var i = article.TagList.Count - 1; i >= 0; i--) // here we go through the article's tags and remove the ones that aren't included in new tags
+            for (var i = article.TagList.Count - 1; i >= 0; i--) // here we go through the article's tags and remove the ones that aren't included in new tags
             {
                 var tag = article.TagList.ElementAt(i);
 
-                if(!tagList.Contains(tag.TagId))
+                if (!tagList.Contains(tag.TagId))
                 {
                     article.TagList.Remove(tag);
                     _context.ArticleTags.Remove(tag);
@@ -37,7 +37,7 @@ namespace IdeaShare.Application.Services
             foreach (var tag in tags)
             {
                 Tag tagFromDatabase = await _context.Tags.FindAsync(tag); // check if such tag exists in the database. if not, create it
-                if(tagFromDatabase == null) 
+                if (tagFromDatabase == null)
                 {
                     var newTag = new Tag { Id = tag };
                     await _context.Tags.AddAsync(newTag);
@@ -65,7 +65,7 @@ namespace IdeaShare.Application.Services
             return articleTags;
         }
 
-       public async Task<Tag> CreateAsync(string tag)
+        public async Task<Tag> CreateAsync(string tag)
         {
             // Prevent race condition
             var newTag = new Tag { Id = tag };
@@ -74,10 +74,10 @@ namespace IdeaShare.Application.Services
             {
                 await _context.SaveChangesAsync();
                 return newTag;
-            } 
-            catch(Exception e)
+            }
+            catch (Exception e)
             {
-                if(e.InnerException.Message.Contains("Violation of PRIMARY KEY constraint"))
+                if (e.InnerException.Message.Contains("Violation of PRIMARY KEY constraint"))
                 {
                     // We have to detach the entity with duplicate key from this request's DbContext, else EF Core would try to persist it again with the next tag
                     _context.Entry(newTag).State = EntityState.Detached;
@@ -102,10 +102,10 @@ namespace IdeaShare.Application.Services
         }
 
         public async Task<IEnumerable<Tag>> CreateRangeAsync(IEnumerable<string> tags)
-         {
+        {
             var tagsToReturn = new List<Tag>();
 
-            foreach(var tag in tags)
+            foreach (var tag in tags)
             {
                 tagsToReturn.Add(await CreateAsync(tag));
             }
@@ -115,9 +115,9 @@ namespace IdeaShare.Application.Services
 
         public void RefreshTags(IEnumerable<ArticleTag> oldTags, IEnumerable<ArticleTag> newTags) // should be removed?
         {
-            foreach(var tag in oldTags)
+            foreach (var tag in oldTags)
             {
-                if(!newTags.Contains(tag))
+                if (!newTags.Contains(tag))
                 {
                     _context.ArticleTags.Remove(tag);
                 }
