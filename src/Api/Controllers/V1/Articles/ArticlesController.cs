@@ -1,8 +1,8 @@
 ﻿using AutoMapper;
 using IdeaShare.Api.Models;
+using IdeaShare.Application.Interfaces;
 using IdeaShare.Application.Models.ArticleModels;
 using IdeaShare.Application.Models.CommentModels;
-using IdeaShare.Application.Interfaces;
 using IdeaShare.Extensions.Microsoft.AspNetCore.Mvc.ModelBinding;
 using IdeaShare.Extensions.System;
 using IdeaShare.Extensions.System.Security.Claims;
@@ -46,14 +46,14 @@ namespace IdeaShare.Api.Areas.Articles.Controllers
             //}
             //else
 
-            if((!page.HasValue && perPage.HasValue) || (page.HasValue && !perPage.HasValue))
+            if ((!page.HasValue && perPage.HasValue) || (page.HasValue && !perPage.HasValue))
             {
                 return BadRequest("You have to provide both page and perPage parameters for pagination.");
             }
 
             int startIndex = -1, length = -1;
 
-            if(page.HasValue && perPage.HasValue)
+            if (page.HasValue && perPage.HasValue)
             {
                 startIndex = perPage.Value * (page.Value - 1);
                 length = perPage.Value;
@@ -79,7 +79,7 @@ namespace IdeaShare.Api.Areas.Articles.Controllers
         {
             var article = await _articleService.GetAsync(articleId);
 
-            if(article == null)
+            if (article == null)
             {
                 return NotFound($"Article with an ID of {articleId} cannot be found.");
             }
@@ -94,7 +94,7 @@ namespace IdeaShare.Api.Areas.Articles.Controllers
         {
             var result = await _articleService.CreateAsync(User.GetId(), model);
 
-            if(result.Success)
+            if (result.Success)
             {
                 return Created($"{Contracts.V1.ApiRoutes.Articles.GetSingle.FillRouteParameters(result.Payload.Id)}", _mapper.Map<ArticleDetailsModel>(result.Payload));
             }
@@ -115,7 +115,7 @@ namespace IdeaShare.Api.Areas.Articles.Controllers
 
             ModelState.AddModelErrors(result.Errors);
 
-            if(result.Errors.ContainsKey("Article"))
+            if (result.Errors.ContainsKey("Article"))
             {
                 return NotFound(new ValidationResultModel(ModelState));
             }
@@ -133,7 +133,7 @@ namespace IdeaShare.Api.Areas.Articles.Controllers
         public async Task<IActionResult> GetComments(int articleId)
         {
             var result = await _commentService.GetForArticleAsync(articleId);
-            if(!result.Success)
+            if (!result.Success)
             {
                 foreach (var error in result.Errors)
                 {
@@ -190,23 +190,23 @@ namespace IdeaShare.Api.Areas.Articles.Controllers
 
         [Authorize]
         [HttpDelete(Contracts.V1.ApiRoutes.Articles.Comments.Delete)]
-        public async Task<IActionResult> DeleteComment (int articleId, int commentId)
+        public async Task<IActionResult> DeleteComment(int articleId, int commentId)
         {
             var result = await _commentService.RemoveCommentAsync(commentId, User.GetId());
 
-            if(result.Success)
+            if (result.Success)
             {
                 return NoContent();
             }
 
             ModelState.AddModelErrors(result.Errors);
 
-            if(result.Errors.ContainsKey("Comment"))
+            if (result.Errors.ContainsKey("Comment"))
             {
                 return NotFound(new ValidationResultModel(ModelState));
             }
 
-            if(result.Errors.ContainsKey("User"))
+            if (result.Errors.ContainsKey("User"))
             {
                 return Unauthorized(new ValidationResultModel(ModelState));
             }
@@ -215,7 +215,7 @@ namespace IdeaShare.Api.Areas.Articles.Controllers
 
         }
 
-        [HttpPost(Contracts.V1.ApiRoutes.Articles.Update)]
+        [HttpPatch(Contracts.V1.ApiRoutes.Articles.Update)]
         public async Task<IActionResult> Update([FromForm] ArticleEditModel model)
         {
             if (!ModelState.IsValid)
@@ -225,7 +225,7 @@ namespace IdeaShare.Api.Areas.Articles.Controllers
 
             var result = await _articleService.UpdateAsync(model, User.GetId());
 
-            if(result.Success)
+            if (result.Success)
             {
                 return NoContent();
             }

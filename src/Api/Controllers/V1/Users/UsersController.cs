@@ -1,8 +1,8 @@
 ﻿using AutoMapper;
 using IdeaShare.Api.Models;
+using IdeaShare.Application.Interfaces;
 using IdeaShare.Application.Models.AppUserModels;
 using IdeaShare.Application.Models.ArticleModels;
-using IdeaShare.Application.Interfaces;
 using IdeaShare.Extensions.Microsoft.AspNetCore.Mvc.ModelBinding;
 using IdeaShare.Extensions.System.Security.Claims;
 using Microsoft.AspNetCore.Authorization;
@@ -80,7 +80,7 @@ namespace IdeaShare.Api.Controllers.V1.Users
         }
 
         [Authorize]
-        [HttpPost(Contracts.V1.ApiRoutes.Users.Update)]
+        [HttpPatch(Contracts.V1.ApiRoutes.Users.Update)]
         public async Task<IActionResult> Update(string username, [FromForm] AppUserUpdateModel updateModel)
         {
             if (string.IsNullOrEmpty(username))
